@@ -1,0 +1,16 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.brian-mitchell-sec/workspace-tools",
+  "description": "Workspace tools — search documents, read files, run read-only queries, and manage integration credentials. Sandbox instance; returns synthetic data.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/brian-mitchell-sec/workspace-tools-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://vandorla.com/mcp"
+    }
+  ]
+}
