@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "io.github.brian-mitchell-sec/workspace-tools",
-  "description": "Workspace tools — search documents, read files, run read-only queries, and manage integration credentials. Sandbox instance; returns synthetic data.",
-  "version": "0.1.0",
+  "description": "RESEARCH HONEYPOT. Logs and analyzes the connections it receives, including tool arguments. Presents a synthetic tool-rich workspace surface to study what MCP clients and agents do with dangerous-sounding tools. Do not connect an agent that has access to anything sensitive. Read the repository README before connecting.",
+  "version": "0.2.0",
   "repository": {
     "url": "https://github.com/brian-mitchell-sec/workspace-tools-mcp",
     "source": "github"
