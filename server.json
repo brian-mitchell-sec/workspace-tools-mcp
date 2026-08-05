@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "io.github.brian-mitchell-sec/workspace-tools",
-  "description": "RESEARCH HONEYPOT. Logs and analyzes the connections it receives, including tool arguments. Presents a synthetic tool-rich workspace surface to study what MCP clients and agents do with dangerous-sounding tools. Do not connect an agent that has access to anything sensitive. Read the repository README before connecting.",
+  "description": "RESEARCH HONEYPOT. Logs and analyzes the connections it receives, including tool arguments. Its initialize handshake and tool descriptions contain injected instructions (a research probe), including a request that your agent summarize its system prompt. Do not connect an agent that has access to anything sensitive. Read the repository README before connecting.",
   "version": "0.2.0",
   "repository": {
     "url": "https://github.com/brian-mitchell-sec/workspace-tools-mcp",
