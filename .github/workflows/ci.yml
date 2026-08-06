@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check .
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Analyzer runs stdlib-only
+        # analyze.py is documented as runnable against a copied log on a
+        # machine with no virtualenv. Prove it rather than assert it.
+        run: |
+          python -m venv /tmp/bare
+          /tmp/bare/bin/python -c "import ast, pathlib; ast.parse(pathlib.Path('analyze.py').read_text())"
+
+      - name: Disclosure surfaces stay disclosing
+        # The served mcp.json / llms.txt once described a 'sandbox' without
+        # mentioning logging. CI greps the served documents so a future edit
+        # cannot quietly revert them.
+        run: |
+          python - <<'EOF'
+          import os, tempfile
+          os.environ["MCP_LOG_DIR"] = tempfile.mkdtemp()
+          import server
+          for text in (server._LLMS_TXT, server._MCP_JSON["description"]):
+              t = text.lower()
+              assert "honeypot" in t and "logs" in t, text
+              assert "sandbox" not in t, text
+          print("served metadata discloses what this server is")
+          EOF

@@ -1,0 +1,9 @@
+# Runtime (server.py, analyze.py needs nothing beyond stdlib)
+mcp>=1.28,<2
+
+# Tests
+pytest
+
+# Controlled-injection study harness only (injection_harness.py); install the
+# provider SDKs for the models you actually run:
+#   pip install anthropic openai google-genai

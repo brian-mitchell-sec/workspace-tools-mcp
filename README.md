@@ -20,6 +20,13 @@ what it sends as arguments, and what a client does with a tool nobody asked it
 to use are all open and all measurable. This is the instrument for measuring
 them.
 
+**What 12 days of running it showed:** a registry-listed server drew 1,081
+`initialize` handshakes from 688 IPs — all ecosystem indexers — while an
+identical unlisted server drew zero; exactly one tool was ever called; and the
+injection probes were read 858 times and complied with zero times (a bounded
+null — no model-in-the-loop client ever showed up to inject). Full writeup:
+[FINDINGS.md](FINDINGS.md).
+
 ## Disclosure
 
 This repository and its registry listing originally described this as a sandbox
@@ -93,18 +100,46 @@ If you want to exercise a tool-rich MCP server without that, run one locally.
 
 ## Source
 
-The implementation is not published, so the behaviour described above is not
-independently verifiable by you. That is a real limitation and worth stating
-plainly rather than leaving implied: you are being asked to take my word for
-what a black box does with what you send it.
+The full implementation is published in this repository and is the code the
+live endpoint runs:
 
-Treat this listing as a hosted research service with a disclosed telemetry
-policy, and not as open-source software you can audit. The MIT licence covers
-this repository's contents, which are the manifest and this document.
+| file | what it is |
+|---|---|
+| `server.py` | The honeypot itself: FastMCP server, bait tools, all five injection channels, telemetry middleware, canary catcher. |
+| `analyze.py` | Offline analyzer for the JSONL telemetry: per-host breakdown, client taxonomy, cadence. Stdlib only. |
+| `FINDINGS.md` | The 12-day A/B field study this instrument produced (registered vs. unlisted arm): what actually connects to a public MCP server. |
+| `injection_harness.py` | Controlled experiment harness: points frontier models at a LOCAL copy of the server and measures injection compliance per model/framing. |
+| `analyze_injection.py` | Statistics for the harness output (per-model compliance with Wilson CIs). |
+| `tests/` | Telemetry redaction, admin-chain state machine, and disclosure-surface consistency tests. |
+
+Every response is still synthetic and the data-minimization rules in
+[DATA-HANDLING.md](DATA-HANDLING.md) still apply to the deployment — the code
+being public does not change what the live server retains (the injection sink
+stores a digest, never the leaked text; auth-shaped headers are redacted at
+write time).
 
 A related instrument with the same thesis, applied to HTTP scanners rather than
 MCP clients, is fully open and auditable:
 <https://github.com/brian-mitchell-sec/http-bait>.
+
+## Run your own
+
+```bash
+pip install -r requirements.txt
+MCP_LOG_DIR=./data/logs \
+MCP_REGISTERED_HOST=your-host.example.com \
+MCP_CANARY_BASE=https://your-host.example.com \
+uvicorn server:app --host 0.0.0.0 --port 9000
+```
+
+Put TLS in front of it (the telemetry trusts `X-Forwarded-For` only because the
+front proxy sets it — serve directly and you must not trust that header), then
+analyze what you collected with `python3 analyze.py data/logs/mcp_events.jsonl`.
+
+To extend the instrument — new bait tools, new injection channels, new lure
+framings — see [EXTENDING.md](EXTENDING.md). The controlled-study harness
+(`injection_harness.py`) runs against a local copy; per-frame baselines require
+the `MCP_CLEAN_*` toggles documented there.
 
 ## Connect
 
